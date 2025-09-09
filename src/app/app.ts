@@ -9,6 +9,8 @@ interface Photo {
   type: PhotoType;
 }
 
+type Result = 'unanswered' | 'yes' | 'sorry';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -26,7 +28,6 @@ interface Photo {
           (keydown.enter)="pick(i)"
           (keydown.space)="pick(i)"
           [class.clickable]="clickedIndex() === null"
-          [class.active]="clickedIndex() === i"
           [class.disabled]="clickedIndex() !== null && clickedIndex() !== i"
           role="button"
           [attr.aria-disabled]="clickedIndex() !== null && clickedIndex() !== i ? 'true' : null"
@@ -35,11 +36,13 @@ interface Photo {
         >
           <img [src]="p.src" [alt]="p.alt" />
           <div
-            class="overlay success"
-            *ngIf="clickedIndex() === i"
+            class="overlay"
+            *ngIf="results()[i] !== 'unanswered'"
+            [class.success]="results()[i] === 'yes'"
+            [class.fail]="results()[i] === 'sorry'"
             aria-live="polite"
           >
-            <span>yes, that's Mad Max</span>
+            <span>{{ overlayText(i) }}</span>
           </div>
         </div>
       </div>
@@ -66,7 +69,8 @@ interface Photo {
     .card.disabled {
       pointer-events: none;    
       cursor: default;
-      opacity: .4;             
+      opacity: .5;             
+      filter: grayscale(.80);
     }
     .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .overlay {
@@ -74,6 +78,7 @@ interface Photo {
       font-weight: 800; font-size: clamp(1rem, 2.4vw, 1.5rem); color: #fff;
     }
     .overlay.success { background: rgba(16,185,129,.88); } 
+    .overlay.fail    { background: rgba(239,68,68,.90); } 
     button {
       padding: .6rem 1rem; border: none; border-radius: .7rem; background: #111827; color: #fff; cursor: pointer;
     }
@@ -93,6 +98,7 @@ export class App {
   ]);
 
   pair = signal<Photo[]>([]);
+  results = signal<Result[]>(['unanswered','unanswered']);
   clickedIndex = signal<number | null>(null);
 
   constructor() { this.loadNewPair(); }
@@ -103,11 +109,26 @@ export class App {
     const pdx = photos.filter(p => p.type === 'portland');
     const pick = (arr: Photo[]) => arr[Math.floor(Math.random() * arr.length)];
     this.pair.set([pick(mad), pick(pdx)].sort(() => Math.random() - 0.5));
-    this.clickedIndex.set(null);    
+    this.results.set(['unanswered','unanswered']);
+    this.clickedIndex.set(null);
   }
 
   pick(i: number) {
-    if (this.clickedIndex() !== null) return;
+    if (this.results()[i] !== 'unanswered') return;
+    const clicked = this.pair()[i];
+    const outcome: Result = clicked.type === 'portland' ? 'yes' : 'sorry';
+    this.results.update(r => {
+      const next = [...r];
+      next[i] = outcome;
+      return next;
+    });
     this.clickedIndex.set(i);
+  }
+
+  overlayText(i: number) {
+    const r = this.results()[i];
+    if (r === 'yes')   return 'Yes! This is the wasteland seen in Mad Max';
+    if (r === 'sorry') return 'Sorry, this is a photo of Portland';
+    return '';
   }
 }
