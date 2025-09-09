@@ -86,15 +86,34 @@ type Result = 'unanswered' | 'yes' | 'sorry';
 })
 
 export class App {
-  title = signal('Portland or Mad Max?');
+  title = signal('Portland or Mad Max');
 
   allPhotos = signal<Photo[]>([
+    { src: 'assets/madmax/furiosa-1.jpg', alt: 'Mad Max Furiosa', type: 'madmax' },
     { src: 'assets/madmax/fury-road-1.jpg', alt: 'Mad Max Fury Road convoy driving still',   type: 'madmax' },
     { src: 'assets/madmax/fury-road-2.jpeg', alt: 'Mad Max Fury Road convoy attack still',  type: 'madmax' },
+    { src: 'assets/madmax/fury-road-3.jpg', alt: 'Mad Max Fury Road still', type: 'madmax' },
+    { src: 'assets/madmax/fury-road-4.jpg', alt: 'Mad Max Fury Road still', type: 'madmax' },
+    { src: 'assets/madmax/fury-road-5.jpg', alt: 'Mad Max Fury Road still', type: 'madmax' },
+    { src: 'assets/madmax/fury-road-6.jpg', alt: 'Mad Max Fury Road still', type: 'madmax' },
+    { src: 'assets/madmax/fury-road-7.jpg', alt: 'Mad Max Fury Road still', type: 'madmax' },
     { src: 'assets/madmax/road-warrior-1.jpg', alt: 'Mad Max Road Warrior still',  type: 'madmax' },
+    { src: 'assets/madmax/road-warrior-1.jpg', alt: 'Mad Max Road Warrior still',  type: 'madmax' },
+    { src: 'assets/madmax/thunderdome-1.jpg', alt: 'Mad Max Beyond Thunderdome still',  type: 'madmax' },
+    { src: 'assets/madmax/thunderdome-2.jpg', alt: 'Mad Max Beyond Thunderdome still',  type: 'madmax' },
+    { src: 'assets/portland/4t-trail.jpg', alt: '4T Trail photo', type: 'portland' },
+    { src: 'assets/portland/cherry-blossom.jpg', alt: 'Skyline behind cherry blossom trees', type: 'portland' },
+    { src: 'assets/portland/convention-center.jpg', alt: 'Portland Convention Center', type: 'portland' },
+    { src: 'assets/portland/lan-su-garden.jpg', alt: 'Lan Su Chinese Garden', type: 'portland' },
+    { src: 'assets/portland/marquam-bridge.jpg', alt: 'Marquam Bridge', type: 'portland' },
+    { src: 'assets/portland/max-downtown.jpg', alt: 'MAX in downtown Portland', type: 'portland' },
     { src: 'assets/portland/max-to-hillsboro.jpg', alt: 'MAX to Hillsboro in downtown Portland', type: 'portland' },
     { src: 'assets/portland/old-town-stag-sunset.jpg', alt: 'Old Town White Stag sign at sunset', type: 'portland' },
     { src: 'assets/portland/old-town-stag.jpg', alt: 'Old Town White Stag sign at twilight', type: 'portland' },
+    { src: 'assets/portland/portland-sign-1.jpg', alt: 'Portland sign on building', type: 'portland' },
+    { src: 'assets/portland/powells.jpg', alt: 'Powells bookstore', type: 'portland' },
+    { src: 'assets/portland/st-johns-bridge-1.jpg', alt: 'St. Johns Bridge', type: 'portland' },
+    { src: 'assets/portland/tilikum-crossing-bridge-night.jpg', alt: 'Tilikum Crossing Bridge', type: 'portland' },
   ]);
 
   pair = signal<Photo[]>([]);
