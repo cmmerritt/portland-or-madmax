@@ -16,26 +16,67 @@ interface Photo {
   template: `
     <main class="container">
       <h1>{{ title() }}</h1>
+      <h2>Can YOU tell the difference between Portland and Mad Max?</h2>
+      <h2><i>Select the image that best depicts the postapocalyptic dystopia portrayed in the Mad Max film series</i></h2>
       <div class="grid">
-        <div class="card" *ngFor="let p of pair(); let i = index">
+        <div
+          class="card"
+          *ngFor="let p of pair(); let i = index"
+          (click)="pick(i)"
+          (keydown.enter)="pick(i)"
+          (keydown.space)="pick(i)"
+          [class.clickable]="clickedIndex() === null"
+          [class.active]="clickedIndex() === i"
+          [class.disabled]="clickedIndex() !== null && clickedIndex() !== i"
+          role="button"
+          [attr.aria-disabled]="clickedIndex() !== null && clickedIndex() !== i ? 'true' : null"
+          [attr.tabindex]="clickedIndex() === null ? 0 : (clickedIndex() === i ? 0 : -1)"
+          [attr.aria-label]="'Choose image ' + (i + 1)"
+        >
           <img [src]="p.src" [alt]="p.alt" />
-          <div class="label">{{ p.type }}</div>
+          <div
+            class="overlay success"
+            *ngIf="clickedIndex() === i"
+            aria-live="polite"
+          >
+            <span>yes, that's Mad Max</span>
+          </div>
         </div>
       </div>
+
       <button type="button" (click)="loadNewPair()">New pair</button>
     </main>
   `,
   styles: [`
-    .container { max-width:900px;margin:2rem auto;padding:0 1rem;text-align:center;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif }
-    .tagline { color:#6b7280;margin-top:0 }
-    .grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0 1.5rem }
-    .card { position:relative;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;
-      aspect-ratio:4/3;box-shadow:0 1px 2px rgba(0,0,0,.06) }
-    .card img { width:100%;height:100%;object-fit:cover;display:block }
-    .label { position:absolute;left:.5rem;bottom:.5rem;background:rgba(17,24,39,.85);
-      color:white;padding:.25rem .5rem;border-radius:.5rem;font-size:.8rem }
-    button { padding:.6rem 1rem;border:none;border-radius:.7rem;background:#111827;color:#fff;cursor:pointer }
+    * { box-sizing: border-box; }
+    .container {
+      max-width: 900px; margin: 2rem auto; padding: 0 1rem; text-align: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    .tagline { color:#6b7280; margin-top: 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0 1.5rem; }
+    .card {
+      position: relative; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
+      aspect-ratio: 4/3; box-shadow: 0 1px 2px rgba(0,0,0,.06); outline: none; cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+    .card.clickable:hover, .card.clickable:focus-visible {
+      transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    }
+    .card.disabled {
+      pointer-events: none;    
+      cursor: default;
+      opacity: .4;             
+    }
+    .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .overlay {
+      position: absolute; inset: 0; display: grid; place-items: center; padding: 1rem;
+      font-weight: 800; font-size: clamp(1rem, 2.4vw, 1.5rem); color: #fff;
+    }
+    .overlay.success { background: rgba(16,185,129,.88); } 
+    button {
+      padding: .6rem 1rem; border: none; border-radius: .7rem; background: #111827; color: #fff; cursor: pointer;
+    }
   `],
 })
 
@@ -52,17 +93,21 @@ export class App {
   ]);
 
   pair = signal<Photo[]>([]);
+  clickedIndex = signal<number | null>(null);
 
-  constructor() {
-    this.loadNewPair();
-  }
+  constructor() { this.loadNewPair(); }
 
   loadNewPair() {
     const photos = this.allPhotos();
     const mad = photos.filter(p => p.type === 'madmax');
     const pdx = photos.filter(p => p.type === 'portland');
     const pick = (arr: Photo[]) => arr[Math.floor(Math.random() * arr.length)];
-    const shuffled = [pick(mad), pick(pdx)].sort(() => Math.random() - 0.5);
-    this.pair.set(shuffled);
+    this.pair.set([pick(mad), pick(pdx)].sort(() => Math.random() - 0.5));
+    this.clickedIndex.set(null);    
+  }
+
+  pick(i: number) {
+    if (this.clickedIndex() !== null) return;
+    this.clickedIndex.set(i);
   }
 }
