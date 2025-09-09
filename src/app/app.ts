@@ -47,7 +47,7 @@ type Result = 'unanswered' | 'yes' | 'sorry';
         </div>
       </div>
 
-      <button type="button" (click)="loadNewPair()">New pair</button>
+      <button type="button" (click)="loadNewPair()">Try again!</button>
     </main>
   `,
   styles: [`
