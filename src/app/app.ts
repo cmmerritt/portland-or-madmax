@@ -17,11 +17,12 @@ interface Photo {
     <main class="container">
       <h1>{{ title() }}</h1>
       <div class="grid">
-        <div class="card" *ngFor="let p of firstTwo(); let i = index">
+        <div class="card" *ngFor="let p of pair(); let i = index">
           <img [src]="p.src" [alt]="p.alt" />
           <div class="label">{{ p.type }}</div>
         </div>
       </div>
+      <button type="button" (click)="loadNewPair()">New pair</button>
     </main>
   `,
   styles: [`
@@ -34,6 +35,7 @@ interface Photo {
     .card img { width:100%;height:100%;object-fit:cover;display:block }
     .label { position:absolute;left:.5rem;bottom:.5rem;background:rgba(17,24,39,.85);
       color:white;padding:.25rem .5rem;border-radius:.5rem;font-size:.8rem }
+    button { padding:.6rem 1rem;border:none;border-radius:.7rem;background:#111827;color:#fff;cursor:pointer }
   `],
 })
 
@@ -49,5 +51,18 @@ export class App {
     { src: 'assets/portland/old-town-stag.jpg', alt: 'Old Town White Stag sign at twilight', type: 'portland' },
   ]);
 
-  firstTwo() { return this.allPhotos().slice(0, 2); }
+  pair = signal<Photo[]>([]);
+
+  constructor() {
+    this.loadNewPair();
+  }
+
+  loadNewPair() {
+    const photos = this.allPhotos();
+    const mad = photos.filter(p => p.type === 'madmax');
+    const pdx = photos.filter(p => p.type === 'portland');
+    const pick = (arr: Photo[]) => arr[Math.floor(Math.random() * arr.length)];
+    const shuffled = [pick(mad), pick(pdx)].sort(() => Math.random() - 0.5);
+    this.pair.set(shuffled);
+  }
 }
